@@ -66,7 +66,7 @@ export function Reveal({ from, today, onChangeDate }: RevealProps) {
         transition={{ duration: reduce ? 0.18 : 0.2, delay: reduce ? 0 : 0.12 }}
         onClick={onChangeDate}
       >
-        <RotateCcw aria-hidden="true" size={16} strokeWidth={1.75} />
+        <RotateCcw aria-hidden="true" size={22} strokeWidth={2.25} />
         Change date
       </motion.button>
     </div>
