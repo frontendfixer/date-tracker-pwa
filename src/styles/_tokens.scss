@@ -1,0 +1,22 @@
+:root {
+  --bg: #f7f3ee;
+  --ink: #2b2025;
+  --muted: #8c7f86;
+  --accent: #b4838e;
+  --error: #b5624e;
+  --font-serif: 'Fraunces Variable', 'Iowan Old Style', Palatino, 'Palatino Linotype', Georgia, serif;
+  --font-sans: 'Inter Variable', 'Avenir Next', system-ui, sans-serif;
+  --content: 32rem;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16121a;
+    --ink: #efe7e3;
+    --muted: #8e8590;
+    --accent: #c79aa4;
+    --error: #d07c66;
+    color-scheme: dark;
+  }
+}
