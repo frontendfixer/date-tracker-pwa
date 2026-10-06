@@ -78,7 +78,7 @@ input {
 .passcode__field {
   position: relative;
   min-height: 5.75rem;
-  padding: 1.35rem 0.75rem;
+  padding: 1.35rem 0.4rem;
 }
 
 .passcode__field:has(.passcode__input:focus-visible) .passcode__slots {
@@ -92,7 +92,7 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
+  gap: clamp(0.55rem, 4.6vw, 1.2rem);
 }
 
 .passcode__slots.is-error {
@@ -103,8 +103,8 @@ input {
   position: relative;
   display: grid;
   place-items: center;
-  width: 2.35rem;
-  height: 4.5rem;
+  width: clamp(1.65rem, 9.6vw, 2.4rem);
+  height: clamp(3.4rem, 15vw, 4.75rem);
 }
 
 .passcode__mark,
@@ -113,8 +113,8 @@ input {
 }
 
 .passcode__mark {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: clamp(1rem, 4.8vw, 1.35rem);
+  height: clamp(1rem, 4.8vw, 1.35rem);
   border-radius: 50%;
   border: 2px solid var(--slot);
 }
@@ -128,7 +128,7 @@ input {
   font-family: var(--font-serif);
   font-optical-sizing: auto;
   font-weight: 700;
-  font-size: 3rem;
+  font-size: clamp(2.4rem, 11vw, 3.15rem);
   line-height: 1;
   color: var(--ink);
   font-variant-numeric: tabular-nums lining-nums;
@@ -226,13 +226,14 @@ input {
   font-weight: 700;
   font-size: clamp(6rem, 30vw, 11rem);
   line-height: 0.82;
+  padding-bottom: 0.18em;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums lining-nums;
   color: var(--ink);
 }
 
 .elapsed__unit {
-  margin-top: 0.85rem;
+  margin-top: 0.15rem;
   font-family: var(--font-sans);
   font-weight: 650;
   font-size: 1.1rem;
