@@ -6,9 +6,9 @@ import {
   breakdownLines,
   formatDateLine,
   formatPrimaryCount,
-  formatUntilDue,
   formatWeekday,
   unitWord,
+  untilDueParts,
   untilDueWeeksLine,
 } from '../lib/format'
 
@@ -26,6 +26,7 @@ export function Reveal({ from, today, onChangeDate }: RevealProps) {
   const due = dueDate(from)
   const dueLine = formatDateLine(due)
   const remaining = untilDue(due, today)
+  const countdown = untilDueParts(remaining)
   const remainingWeeks = untilDueWeeksLine(remaining)
   const shift = reduce ? 0 : 10
 
@@ -70,7 +71,10 @@ export function Reveal({ from, today, onChangeDate }: RevealProps) {
             <span className="date-line__main">{dueLine.dayMonth}</span>{' '}
             <span className="date-line__year">{dueLine.year}</span>
           </p>
-          <p className="due__count">{formatUntilDue(remaining)}</p>
+          <p className="due__count">
+            {countdown.value ? <span className="due__value">{countdown.value}</span> : null}
+            <span className={countdown.value ? 'due__unit' : 'due__today'}>{countdown.label}</span>
+          </p>
           {remainingWeeks ? <p className="due__weeks">{remainingWeeks}</p> : null}
         </motion.div>
       </motion.div>

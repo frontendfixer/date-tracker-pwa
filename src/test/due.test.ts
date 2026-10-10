@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { dueDate, untilDue } from '../lib/due'
 import { elapsed } from '../lib/elapsed'
-import { formatDateLine, formatUntilDue, formatWeekday, untilDueWeeksLine } from '../lib/format'
+import { formatDateLine, formatWeekday, untilDueParts, untilDueWeeksLine } from '../lib/format'
 
 describe('dueDate', () => {
   it('matches the 17 Feb 2026 → 6 Oct 2026 fixture', () => {
@@ -15,7 +15,7 @@ describe('dueDate', () => {
 
     const result = untilDue(due, today)
     expect(result).toEqual({ days: 49, weeks: 7, weekRemainderDays: 0 })
-    expect(formatUntilDue(result)).toBe('49 days to go')
+    expect(untilDueParts(result)).toEqual({ value: '49', label: 'days to go' })
     expect(untilDueWeeksLine(result)).toBe('7 weeks · 0 days')
     expect(elapsed(lmp, today).days + result.days).toBe(280)
   })
@@ -46,24 +46,24 @@ describe('untilDue', () => {
   it('hides the weeks line inside the final week', () => {
     const result = untilDue(due, new Date(2026, 10, 23))
     expect(result).toEqual({ days: 1, weeks: 0, weekRemainderDays: 1 })
-    expect(formatUntilDue(result)).toBe('1 day to go')
+    expect(untilDueParts(result)).toEqual({ value: '1', label: 'day to go' })
     expect(untilDueWeeksLine(result)).toBeNull()
   })
 
   it('reads "Due today" on the due date', () => {
     const result = untilDue(due, due)
     expect(result.days).toBe(0)
-    expect(formatUntilDue(result)).toBe('Due today')
+    expect(untilDueParts(result)).toEqual({ value: null, label: 'Due today' })
     expect(untilDueWeeksLine(result)).toBeNull()
   })
 
   it('counts days past due with no weeks line', () => {
     const one = untilDue(due, new Date(2026, 10, 25))
     expect(one).toEqual({ days: -1, weeks: 0, weekRemainderDays: 0 })
-    expect(formatUntilDue(one)).toBe('1 day past due')
+    expect(untilDueParts(one)).toEqual({ value: '1', label: 'day past due' })
 
     const ten = untilDue(due, new Date(2026, 11, 4))
-    expect(formatUntilDue(ten)).toBe('10 days past due')
+    expect(untilDueParts(ten)).toEqual({ value: '10', label: 'days past due' })
     expect(untilDueWeeksLine(ten)).toBeNull()
   })
 })

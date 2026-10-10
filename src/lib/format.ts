@@ -41,11 +41,15 @@ export function breakdownLines(result: Elapsed): string[] {
   return lines
 }
 
-/** Countdown to the due date, or how far past it. */
-export function formatUntilDue(result: UntilDue): string {
-  if (result.days === 0) return 'Due today'
-  if (result.days < 0) return `${formatQuantity(-result.days, 'day')} past due`
-  return `${formatQuantity(result.days, 'day')} to go`
+/**
+ * Countdown to the due date as a large count and its label.
+ * On the due date there is no count, only the label.
+ */
+export function untilDueParts(result: UntilDue): { value: string | null; label: string } {
+  if (result.days === 0) return { value: null, label: 'Due today' }
+  const count = Math.abs(result.days)
+  const tail = result.days < 0 ? 'past due' : 'to go'
+  return { value: formatPrimaryCount(count), label: `${unitWord(count, 'day')} ${tail}` }
 }
 
 /** Weeks line under the countdown. Omitted when under a week remains. */
