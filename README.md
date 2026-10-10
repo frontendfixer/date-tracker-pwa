@@ -1,6 +1,8 @@
 # Since
 
-A private, single-screen date PWA. A 6-digit `DDMMYY` code unlocks that day and shows how much time has passed since, counted in local calendar days.
+A private, single-screen pregnancy date PWA. A 6-digit `DDMMYY` code is the first day of the last menstrual period (LMP). It unlocks that day and shows how much time has passed since, counted in local calendar days.
+
+Below that it shows the expected date of delivery and the days left. The due date follows Naegele's rule as used in Indian antenatal practice: LMP + 9 calendar months + 7 days. This lands 280–283 days after the LMP, depending on month lengths. Once the date passes, it counts days past due.
 
 ## Run
 

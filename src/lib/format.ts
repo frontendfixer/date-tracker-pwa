@@ -1,4 +1,5 @@
 import { format } from 'date-fns'
+import type { UntilDue } from './due'
 import type { Elapsed } from './elapsed'
 
 export function formatWeekday(date: Date): string {
@@ -38,4 +39,21 @@ export function breakdownLines(result: Elapsed): string[] {
     )
   }
   return lines
+}
+
+/**
+ * Countdown to the due date as a large count and its label.
+ * On the due date there is no count, only the label.
+ */
+export function untilDueParts(result: UntilDue): { value: string | null; label: string } {
+  if (result.days === 0) return { value: null, label: 'Due today' }
+  const count = Math.abs(result.days)
+  const tail = result.days < 0 ? 'past due' : 'to go'
+  return { value: formatPrimaryCount(count), label: `${unitWord(count, 'day')} ${tail}` }
+}
+
+/** Weeks line under the countdown. Omitted when under a week remains. */
+export function untilDueWeeksLine(result: UntilDue): string | null {
+  if (result.weeks === 0) return null
+  return `${formatQuantity(result.weeks, 'week')} · ${formatQuantity(result.weekRemainderDays, 'day')}`
 }
