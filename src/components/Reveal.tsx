@@ -1,12 +1,15 @@
 import { RotateCcw } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
+import { dueDate, untilDue } from '../lib/due'
 import { elapsed } from '../lib/elapsed'
 import {
   breakdownLines,
   formatDateLine,
   formatPrimaryCount,
+  formatUntilDue,
   formatWeekday,
   unitWord,
+  untilDueWeeksLine,
 } from '../lib/format'
 
 type RevealProps = {
@@ -20,6 +23,10 @@ export function Reveal({ from, today, onChangeDate }: RevealProps) {
   const result = elapsed(from, today)
   const lines = breakdownLines(result)
   const { dayMonth, year } = formatDateLine(from)
+  const due = dueDate(from)
+  const dueLine = formatDateLine(due)
+  const remaining = untilDue(due, today)
+  const remainingWeeks = untilDueWeeksLine(remaining)
   const shift = reduce ? 0 : 10
 
   const list = {
@@ -57,6 +64,15 @@ export function Reveal({ from, today, onChangeDate }: RevealProps) {
             ))}
           </motion.div>
         ) : null}
+        <motion.div className="due" variants={item}>
+          <p className="due__label">Due · {formatWeekday(due)}</p>
+          <p className="due__date">
+            <span className="date-line__main">{dueLine.dayMonth}</span>{' '}
+            <span className="date-line__year">{dueLine.year}</span>
+          </p>
+          <p className="due__count">{formatUntilDue(remaining)}</p>
+          {remainingWeeks ? <p className="due__weeks">{remainingWeeks}</p> : null}
+        </motion.div>
       </motion.div>
       <motion.button
         type="button"
