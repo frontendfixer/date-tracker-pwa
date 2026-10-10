@@ -5,6 +5,7 @@ import { Reveal } from './components/Reveal'
 import { useStoredCode } from './hooks/useStoredCode'
 import { useToday } from './hooks/useToday'
 import { parseDateCode } from './lib/dateCode'
+import { EASE_OUT } from './lib/motion'
 
 export function App() {
   const reduce = useReducedMotion() === true
@@ -16,7 +17,6 @@ export function App() {
   }, [code, today, clear])
 
   const from = code ? parseDateCode(code, today) : null
-  const fade = reduce ? 0.2 : 0.28
 
   return (
     <main className="stage">
@@ -27,7 +27,16 @@ export function App() {
             className="screen"
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: fade } }}
+            exit={
+              reduce
+                ? { opacity: 0, transition: { duration: 0.2 } }
+                : {
+                    opacity: 0,
+                    y: -12,
+                    filter: 'blur(4px)',
+                    transition: { duration: 0.28, ease: EASE_OUT },
+                  }
+            }
           >
             <Reveal from={from} today={today} onChangeDate={clear} />
           </motion.div>
@@ -35,13 +44,22 @@ export function App() {
           <motion.div
             key="locked"
             className="screen"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: reduce ? 0.2 : 0.24 } }}
-            exit={{
-              opacity: 0,
-              scale: reduce ? 1 : 0.94,
-              transition: { duration: fade },
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              transition: { duration: reduce ? 0.2 : 0.45, ease: EASE_OUT, delay: reduce ? 0 : 0.1 },
             }}
+            exit={
+              reduce
+                ? { opacity: 0, transition: { duration: 0.2 } }
+                : {
+                    opacity: 0,
+                    scale: 1.08,
+                    filter: 'blur(8px)',
+                    transition: { duration: 0.36, ease: EASE_OUT },
+                  }
+            }
           >
             <Passcode today={today} onUnlock={save} />
           </motion.div>

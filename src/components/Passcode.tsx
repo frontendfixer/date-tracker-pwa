@@ -1,9 +1,12 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useRef, useState, type ClipboardEvent, type FormEvent } from 'react'
 import { parseDateCode } from '../lib/dateCode'
+import { EASE_OUT } from '../lib/motion'
 
 const REVEAL_MS = 450
 const SHAKE_MS = 320
+// Long enough for the dots to pulse in a wave before the screen changes.
+const SUCCESS_MS = 380
 
 type PasscodeProps = {
   today: Date
@@ -15,20 +18,21 @@ export function Passcode({ today, onUnlock }: PasscodeProps) {
   const [value, setValue] = useState('')
   const [shown, setShown] = useState<number | null>(null)
   const [error, setError] = useState(false)
+  const [success, setSuccess] = useState(false)
   const [announcement, setAnnouncement] = useState('')
   const inputRef = useRef<HTMLInputElement | null>(null)
   const busy = useRef(false)
   const revealTimer = useRef(0)
   const clearTimer = useRef(0)
   const liveTimer = useRef(0)
-  const unlockFrame = useRef(0)
+  const unlockTimer = useRef(0)
 
   useEffect(() => {
     return () => {
       window.clearTimeout(revealTimer.current)
       window.clearTimeout(clearTimer.current)
       window.clearTimeout(liveTimer.current)
-      window.cancelAnimationFrame(unlockFrame.current)
+      window.clearTimeout(unlockTimer.current)
     }
   }, [])
 
@@ -78,7 +82,10 @@ export function Passcode({ today, onUnlock }: PasscodeProps) {
       reject()
       return
     }
-    unlockFrame.current = window.requestAnimationFrame(() => onUnlock(digits))
+    busy.current = true
+    setShown(null)
+    setSuccess(true)
+    unlockTimer.current = window.setTimeout(() => onUnlock(digits), reduce ? 0 : SUCCESS_MS)
   }
 
   const onChange = (event: FormEvent<HTMLInputElement>) => {
@@ -103,25 +110,39 @@ export function Passcode({ today, onUnlock }: PasscodeProps) {
             error
               ? reduce
                 ? { opacity: [1, 0.35, 1], x: 0 }
-                : { x: [0, -10, 10, -6, 6, 0], opacity: 1 }
+                : { x: [0, -10, 9, -6, 4, -2, 0], opacity: 1 }
               : { x: 0, opacity: 1 }
           }
-          transition={{ duration: error ? 0.3 : 0 }}
+          transition={{ duration: error ? 0.32 : 0, ease: 'easeOut' }}
         >
           {Array.from({ length: 6 }, (_, index) => {
             const filled = index < value.length
             const showDigit = shown === index && filled
+            const next = index === value.length && !error
             return (
-              <span className="passcode__slot" key={index}>
+              <motion.span
+                className={next ? 'passcode__slot is-next' : 'passcode__slot'}
+                key={index}
+                initial={{ opacity: 0, y: reduce ? 0 : 10 }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale: success && !reduce ? [1, 1.28, 1] : 1,
+                }}
+                transition={{
+                  default: { duration: reduce ? 0.2 : 0.5, ease: EASE_OUT, delay: reduce ? 0 : index * 0.04 },
+                  scale: { duration: 0.32, ease: 'easeInOut', delay: index * 0.035 },
+                }}
+              >
                 <AnimatePresence initial={false}>
                   {showDigit ? (
                     <motion.span
                       key="digit"
                       className="passcode__digit"
-                      initial={{ opacity: 0, scale: reduce ? 1 : 0.82 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: reduce ? 1 : 0.7 }}
-                      transition={{ duration: reduce ? 0.15 : 0.18 }}
+                      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.85 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.6, filter: 'blur(3px)' }}
+                      transition={{ duration: reduce ? 0.15 : 0.22, ease: EASE_OUT }}
                     >
                       {value[index]}
                     </motion.span>
@@ -129,16 +150,20 @@ export function Passcode({ today, onUnlock }: PasscodeProps) {
                     <motion.span
                       key="dot"
                       className="passcode__mark passcode__mark--filled"
-                      initial={{ opacity: 0, scale: reduce ? 1 : 0.45 }}
+                      initial={{ opacity: 0, scale: reduce ? 1 : 0.3 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: reduce ? 1 : 0.6 }}
-                      transition={{ duration: reduce ? 0.15 : 0.18 }}
+                      exit={{ opacity: 0, scale: reduce ? 1 : 0.5 }}
+                      transition={
+                        reduce
+                          ? { duration: 0.15 }
+                          : { type: 'spring', stiffness: 520, damping: 24, opacity: { duration: 0.15 } }
+                      }
                     />
                   ) : (
                     <motion.span key="empty" className="passcode__mark" />
                   )}
                 </AnimatePresence>
-              </span>
+              </motion.span>
             )
           })}
         </motion.div>
